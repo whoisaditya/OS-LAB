@@ -12,7 +12,7 @@ struct node
     int wtime = 0;
 } a[1000], b[1000], c[1000];
 
-void insert(int n)
+void insert(int n, bool A)
 {
     int i;
     for (i = 0; i < n; i++)
@@ -21,8 +21,11 @@ void insert(int n)
         cin >> a[i].pname;
         cout << "Priority: ";
         cin >> a[i].priority;
-        cout << "Arrival Time: ";
-        cin >> a[i].atime;
+        if(A)
+        {cout << "Arrival Time: ";
+        cin >> a[i].atime;}
+        else
+        {a[i].atime = 0;}
         cout << "Burst Time: ";
         cin >> a[i].btime;
         a[i].wtime = -a[i].atime + 1;
@@ -187,11 +190,30 @@ void disp(int nop, int qt)
 int main()
 {
     int nop, choice, i, qt;
+    bool A;
+
+    cout << "Menu" << endl;
+    cout << "1. With Variable Arrival Time" << endl;
+    cout << "2. With all processes arriving at the same time ie at 0" << endl;
+    cout << "Your Choice: ";
+    cin >> choice;
+
+    switch (choice)
+    {
+    case 1:
+        A = true;
+        break;
+
+    case 2:
+        A = false;
+        break;
+    }
+    
     cout << "Enter number of processes\n";
     cin >> nop;
 
     cout << "Enter Process, Priority, AT, BT\n";
-    insert(nop);
+    insert(nop, A);
 
     disp(nop, 1);
     return 0;
