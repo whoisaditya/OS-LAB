@@ -3,13 +3,13 @@
 using namespace std;
 struct node
 {
-    char pname;
-    int btime;
-    int atime;
-    int priority;
-    int restime = 0;
-    int ctime = 0;
-    int wtime = 0;
+    char pid;
+    int bt; // Burst Time
+    int at; // Arrival Time
+    int priority; // Priority
+    int restime = 0; // Rest Time
+    int ct = 0; // Completion Time
+    int wt = 0; // Waiting Time
 } a[1000], b[1000], c[1000];
 
 void insert(int n, bool A)
@@ -18,29 +18,29 @@ void insert(int n, bool A)
     for (i = 0; i < n; i++)
     {
         cout << "Process Name: ";
-        cin >> a[i].pname;
+        cin >> a[i].pid;
         cout << "Priority: ";
         cin >> a[i].priority;
         if(A)
         {cout << "Arrival Time: ";
-        cin >> a[i].atime;}
+        cin >> a[i].at;}
         else
-        {a[i].atime = 0;}
+        {a[i].at = 0;}
         cout << "Burst Time: ";
-        cin >> a[i].btime;
-        a[i].wtime = -a[i].atime + 1;
+        cin >> a[i].bt;
+        a[i].wt = -a[i].at + 1;
         cout << endl;
     }
 }
 
-bool btimeSort(node a, node b)
+bool btSort(node a, node b)
 {
-    return a.btime < b.btime;
+    return a.bt < b.bt;
 }
 
-bool atimeSort(node a, node b)
+bool atSort(node a, node b)
 {
-    return a.atime < b.atime;
+    return a.at < b.at;
 }
 
 bool prioritySort(node a, node b)
@@ -52,7 +52,7 @@ int k = 0, f = 0, r = 0;
 void disp(int nop, int qt)
 {
     int n = nop, q;
-    sort(a, a + n, atimeSort);
+    sort(a, a + n, atSort);
     int ttime = 0, i;
     int j, tArray[20];
     int alltime = 0;
@@ -60,14 +60,14 @@ void disp(int nop, int qt)
 
     for (i = 0; i < n; i++)
     {
-        alltime += a[i].btime;
+        alltime += a[i].bt;
     }
-    alltime += a[0].atime;
+    alltime += a[0].at;
 
     for (i = 0; ttime <= alltime;)
     {
         j = i;
-        while (a[j].atime <= ttime && j != n)
+        while (a[j].at <= ttime && j != n)
         {
             b[r] = a[j];
             j++;
@@ -75,10 +75,10 @@ void disp(int nop, int qt)
         }
         if (r == f)
         {
-            c[k].pname = 'i';
-            c[k].btime = a[j].atime - ttime;
-            c[k].atime = ttime;
-            ttime += c[k].btime;
+            c[k].pid = 'i';
+            c[k].bt = a[j].at - ttime;
+            c[k].at = ttime;
+            ttime += c[k].bt;
             k++;
             continue;
         }
@@ -91,19 +91,19 @@ void disp(int nop, int qt)
             r++;
         }
         j = f;
-        if (b[j].btime > qt)
+        if (b[j].bt > qt)
         {
             c[k] = b[j];
-            c[k].btime = qt;
+            c[k].bt = qt;
             k++;
-            b[j].btime = b[j].btime - qt;
+            b[j].bt = b[j].bt - qt;
             ttime += qt;
             moveLast = true;
             for (q = 0; q < n; q++)
             {
-                if (b[j].pname != a[q].pname)
+                if (b[j].pid != a[q].pid)
                 {
-                    a[q].wtime += qt;
+                    a[q].wt += qt;
                 }
             }
         }
@@ -112,13 +112,13 @@ void disp(int nop, int qt)
             c[k] = b[j];
             k++;
             f++;
-            ttime += b[j].btime;
+            ttime += b[j].bt;
             moveLast = false;
             for (q = 0; q < n; q++)
             {
-                if (b[j].pname != a[q].pname)
+                if (b[j].pid != a[q].pid)
                 {
-                    a[q].wtime += b[j].btime;
+                    a[q].wt += b[j].bt;
                 }
             }
         }
@@ -128,12 +128,12 @@ void disp(int nop, int qt)
         }
     }
     tArray[i] = ttime;
-    ttime += a[i].btime;
+    ttime += a[i].bt;
     for (i = 0; i < k - 1; i++)
     {
-        if (c[i].pname == c[i + 1].pname)
+        if (c[i].pid == c[i + 1].pid)
         {
-            c[i].btime += c[i + 1].btime;
+            c[i].bt += c[i + 1].bt;
             for (j = i + 1; j < k - 1; j++)
             {
                 c[j] = c[j + 1];
@@ -148,12 +148,12 @@ void disp(int nop, int qt)
         rtime = 0;
         for (i = 0; i < k; i++)
         {
-            if (c[i].pname == a[j].pname)
+            if (c[i].pid == a[j].pid)
             {
                 a[j].restime = rtime;
                 break;
             }
-            rtime += c[i].btime;
+            rtime += c[i].bt;
         }
     }
     float averageWaitingTime = 0;
@@ -163,23 +163,23 @@ void disp(int nop, int qt)
     cout << "\n";
     cout << "\n";
     cout << "P.Name Priority AT\tBT\tCT\tTAT\tWT\tRT\n";
-    for (i = 0; i < nop && a[i].pname != 'i'; i++)
+    for (i = 0; i < nop && a[i].pid != 'i'; i++)
     {
-        if (a[i].pname == '\0')
+        if (a[i].pid == '\0')
         {
             break;
         }
-        cout << 'P' << a[i].pname << "\t";
+        cout << 'P' << a[i].pid << "\t";
         cout << a[i].priority << "\t";
-        cout << a[i].atime << "\t";
-        cout << a[i].btime << "\t";
-        cout << a[i].ctime << "\t";
-        cout << a[i].wtime + a[i].ctime - rtime + a[i].btime << "\t";
-        averageTAT += a[i].wtime + a[i].ctime - rtime + a[i].btime;
-        cout << a[i].wtime + a[i].ctime - rtime << "\t";
-        averageWaitingTime += a[i].wtime + a[i].ctime - rtime;
-        cout << a[i].restime - a[i].atime << "\t";
-        averageResponseTime += a[i].restime - a[i].atime;
+        cout << a[i].at << "\t";
+        cout << a[i].bt << "\t";
+        cout << a[i].ct << "\t";
+        cout << a[i].wt + a[i].ct - rtime + a[i].bt << "\t";
+        averageTAT += a[i].wt + a[i].ct - rtime + a[i].bt;
+        cout << a[i].wt + a[i].ct - rtime << "\t";
+        averageWaitingTime += a[i].wt + a[i].ct - rtime;
+        cout << a[i].restime - a[i].at << "\t";
+        averageResponseTime += a[i].restime - a[i].at;
         cout << "\n";
     }
     cout << "Average Response time: " << (float)averageResponseTime / (float)n << endl;
@@ -192,7 +192,7 @@ int main()
     int nop, choice, i, qt;
     bool A;
 
-    cout << "Menu" << endl;
+    cout << "Menu for Priority" << endl;
     cout << "1. With Variable Arrival Time" << endl;
     cout << "2. With all processes arriving at the same time ie at 0" << endl;
     cout << "Your Choice: ";
@@ -208,11 +208,11 @@ int main()
         A = false;
         break;
     }
-    
+
     cout << "Enter number of processes\n";
     cin >> nop;
 
-    cout << "Enter Process, Priority, AT, BT\n";
+    cout << "Enter Process Details\n";
     insert(nop, A);
 
     disp(nop, 1);

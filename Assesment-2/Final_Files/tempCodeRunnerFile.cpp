@@ -8,7 +8,7 @@ struct process
 {
     int pid;// Process ID
     int at; // Arrival Time
-    int bt; // Burst Time
+    int bt; // Busrt Time
     int st; // Start Time
     int ct; // Completion Time
     int tt; // Turnaround Time
@@ -16,10 +16,9 @@ struct process
     int rt; // Response Time
 };
 
-// Function To Implement SRTF Scheduling
-int main()
+// Function To Implement SJF Scheduling 
+void SJF(bool A)
 {
-
     // Initializing the necessary variables
     int n;
     struct process p[100];
@@ -30,87 +29,81 @@ int main()
     int total_wt = 0; // Total Waiting Time
     int total_rt = 0; // Total Response Time
     int total_idle_time = 0;
-    int br[100]; // Burst Remaining
-    int is_completed[100];
 
+    int is_completed[100];
     memset(is_completed, 0, sizeof(is_completed));
 
     cout << setprecision(2) << fixed;
-    
-    // Accepting User Input
-    cout << "STRF" << endl;
+
+    // Taking User Input
     cout << "Enter the number of processes: ";
     cin >> n;
 
     for (int i = 0; i < n; i++)
     {
         cout << "P[" << i + 1 << "]" << endl;
-
-        cout << "Arrival Time: ";
-        cin >> p[i].at;
-
+        if (A)
+        {
+            cout << "Arrival time: ";
+            cin >> p[i].at;
+        }
+        else
+        {
+            p[i].at = 0;
+        }
+        
         cout << "Burst time: ";
         cin >> p[i].bt;
-        
         p[i].pid = i + 1;
-        br[i] = p[i].bt;
         cout << endl;
     }
 
-    // Calculation
     int current_time = 0;
     int completed = 0;
     int prev = 0;
 
+
+    // Calculation
     while (completed != n)
     {
         int idx = -1;
-        int mn = 10000000;
+        int mn = INT_MAX;
         for (int i = 0; i < n; i++)
         {
             if (p[i].at <= current_time && is_completed[i] == 0)
             {
-                if (br[i] < mn)
+                if (p[i].bt < mn)
                 {
-                    mn = br[i];
+                    mn = p[i].bt;
                     idx = i;
                 }
-                if (br[i] == mn)
+                if (p[i].bt == mn)
                 {
                     if (p[i].at < p[idx].at)
                     {
-                        mn = br[i];
+                        mn = p[i].bt;
                         idx = i;
                     }
                 }
             }
         }
-
         if (idx != -1)
         {
-            if (br[idx] == p[idx].bt)
-            {
-                p[idx].st = current_time;
-                total_idle_time += p[idx].st - prev;
-            }
-            br[idx] -= 1;
-            current_time++;
+            p[idx].st = current_time;
+            p[idx].ct = p[idx].st + p[idx].bt;
+            p[idx].tt = p[idx].ct - p[idx].at;
+            p[idx].wt = p[idx].tt - p[idx].bt;
+            p[idx].rt = p[idx].st - p[idx].at;
+
+            total_tt += p[idx].tt;
+            total_wt += p[idx].wt;
+            total_rt += p[idx].rt;
+            total_idle_time += p[idx].st - prev;
+
+            is_completed[idx] = 1;
+            completed++;
+            current_time = p[idx].ct;
             prev = current_time;
-
-            if (br[idx] == 0)
-            {
-                p[idx].ct = current_time;
-                p[idx].tt = p[idx].ct - p[idx].at;
-                p[idx].wt = p[idx].tt - p[idx].bt;
-                p[idx].rt = p[idx].st - p[idx].at;
-
-                total_tt += p[idx].tt;
-                total_wt += p[idx].wt;
-                total_rt += p[idx].rt;
-
-                is_completed[idx] = 1;
-                completed++;
-            }
         }
         else
         {
@@ -118,7 +111,7 @@ int main()
         }
     }
 
-    int min_at = 10000000;
+    int min_at = INT_MAX;
     int max_ct = -1;
     for (int i = 0; i < n; i++)
     {
@@ -147,10 +140,40 @@ int main()
 
     for (int i = 0; i < n; i++)
     {
-        cout << p[i].pid << "\t" << p[i].at << "\t" << p[i].bt << "\t" << p[i].st << "\t" << p[i].ct << "\t" << p[i].tt << "\t" << p[i].wt << "\t" << p[i].rt << "\t"
-             << endl;
+        cout << p[i].pid << "\t" << p[i].at << "\t" << p[i].bt << "\t" << p[i].st << "\t" << p[i].ct << "\t" << p[i].tt << "\t" << p[i].wt << "\t" << p[i].rt << "\t" << endl;
     }
-    cout << "\nAverage Turnaround Time = " << avg_tt << endl;
+    cout << endl;
+    cout << "Average Turnaround Time = " << avg_tt << endl;
     cout << "Average Waiting Time = " << avg_wt << endl;
     cout << "Average Response Time = " << avg_rt << endl;
+}
+
+// Driver Function
+int main()
+{
+    bool A = true;
+    int choice;
+
+    // Menu
+    cout << "Menu" << endl;
+    cout << "1. With Variable Arrival Time" << endl;
+    cout << "2. With all processes arriving at the same time ie at 0" << endl;
+    cout << "Your Choice: ";
+    cin >> choice;
+
+    switch (choice)
+    {
+    case 1:
+        A = true;
+        break;
+
+    case 2:
+        A = false;
+        break;
+    }
+
+    // Calling the SJF Function with the relevant pacrameter
+    SJF(A);
+
+    return 0;
 }

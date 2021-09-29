@@ -5,19 +5,20 @@ using namespace std;
 
 struct process
 {
-    int pid;
-    int arrival_time;
-    int burst_time;
-    int start_time;
-    int completion_time;
-    int turnaround_time;
-    int waiting_time;
-    int response_time;
+    int pid;// Process ID
+    int at; // Arrival Time
+    int bt; // Burst Time
+    int st; // Start Time
+    int ct; // Completion Time
+    int tt; // Turnaround Time
+    int wt; // Waiting Time
+    int rt; // Response Time
 };
 
+// Utitlity Functions
 bool compareArrival(process p1, process p2)
 {
-    return p1.arrival_time < p2.arrival_time;
+    return p1.at < p2.at;
 }
 
 bool compareID(process p1, process p2)
@@ -25,21 +26,24 @@ bool compareID(process p1, process p2)
     return p1.pid < p2.pid;
 }
 
+// Function to implement FCFS
 void FCFS(bool A)
 {
 
+    // Initializing the necessary variables
     int n;
     struct process p[100];
-    float avg_turnaround_time;
-    float avg_waiting_time;
-    float avg_response_time;
-    int total_turnaround_time = 0;
-    int total_waiting_time = 0;
-    int total_response_time = 0;
+    float avg_tt; // Average Turnaround Time
+    float avg_wt; // Average Waiting Time
+    float avg_rt; // Average Respose Time
+    int total_tt = 0; // Total Turnaround Time
+    int total_wt = 0; // Total Waiting Time
+    int total_rt = 0; // Total Response Time
     int total_idle_time = 0;
 
     cout << setprecision(2) << fixed;
 
+    // Taking User Input
     cout << "Enter the number of processes: ";
     cin >> n;
 
@@ -50,15 +54,15 @@ void FCFS(bool A)
         if (A)
         {
             cout << "Arrival time: ";
-            cin >> p[i].arrival_time;
+            cin >> p[i].at;
         }
         else
         {
-            p[i].arrival_time = 0;
+            p[i].at = 0;
         }
         
         cout << "Burst time: ";
-        cin >> p[i].burst_time;
+        cin >> p[i].bt;
 
         p[i].pid = i + 1;
         cout << endl;
@@ -68,24 +72,25 @@ void FCFS(bool A)
 
     for (int i = 0; i < n; i++)
     {
-        p[i].start_time = (i == 0) ? p[i].arrival_time : max(p[i - 1].completion_time, p[i].arrival_time);
-        p[i].completion_time = p[i].start_time + p[i].burst_time;
-        p[i].turnaround_time = p[i].completion_time - p[i].arrival_time;
-        p[i].waiting_time = p[i].turnaround_time - p[i].burst_time;
-        p[i].response_time = p[i].start_time - p[i].arrival_time;
+        p[i].st = (i == 0) ? p[i].at : max(p[i - 1].ct, p[i].at);
+        p[i].ct = p[i].st + p[i].bt;
+        p[i].tt = p[i].ct - p[i].at;
+        p[i].wt = p[i].tt - p[i].bt;
+        p[i].rt = p[i].st - p[i].at;
 
-        total_turnaround_time += p[i].turnaround_time;
-        total_waiting_time += p[i].waiting_time;
-        total_response_time += p[i].response_time;
-        total_idle_time += (i == 0) ? (p[i].arrival_time) : (p[i].start_time - p[i - 1].completion_time);
+        total_tt += p[i].tt;
+        total_wt += p[i].wt;
+        total_rt += p[i].rt;
+        total_idle_time += (i == 0) ? (p[i].at) : (p[i].st - p[i - 1].ct);
     }
 
-    avg_turnaround_time = (float)total_turnaround_time / n;
-    avg_waiting_time = (float)total_waiting_time / n;
-    avg_response_time = (float)total_response_time / n;
+    avg_tt = (float)total_tt / n;
+    avg_wt = (float)total_wt / n;
+    avg_rt = (float)total_rt / n;
 
     sort(p, p + n, compareID);
 
+    // Displaying the Output
     cout << endl;
     cout << "#P\t"
          << "AT\t"
@@ -100,20 +105,22 @@ void FCFS(bool A)
 
     for (int i = 0; i < n; i++)
     {
-        cout << p[i].pid << "\t" << p[i].arrival_time << "\t" << p[i].burst_time << "\t" << p[i].start_time << "\t" << p[i].completion_time << "\t" << p[i].turnaround_time << "\t" << p[i].waiting_time << "\t" << p[i].response_time << "\t" << endl;
+        cout << p[i].pid << "\t" << p[i].at << "\t" << p[i].bt << "\t" << p[i].st << "\t" << p[i].ct << "\t" << p[i].tt << "\t" << p[i].wt << "\t" << p[i].rt << "\t" << endl;
     }
     cout << endl;
-    cout << "Average Turnaround Time = " << avg_turnaround_time << endl;
-    cout << "Average Waiting Time = " << avg_waiting_time << endl;
-    cout << "Average Response Time = " << avg_response_time << endl;
+    cout << "Average Turnaround Time = " << avg_tt << endl;
+    cout << "Average Waiting Time = " << avg_wt << endl;
+    cout << "Average Response Time = " << avg_rt << endl;
 }
 
+// Driver Program
 int main()
 {
     bool A = true;
     int choice;
 
-    cout << "Menu" << endl;
+    // Menu
+    cout << "Menu for FCFS" << endl;
     cout << "1. With Variable Arrival Time" << endl;
     cout << "2. With all processes arriving at the same time ie at 0" << endl;
     cout << "Your Choice: ";
@@ -130,6 +137,7 @@ int main()
         break;
     }
 
+    // Calling the FCFS Function
     FCFS(A);
 
     return 0;
